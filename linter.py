@@ -4,17 +4,20 @@ from SublimeLinter.lint import Linter  # or NodeLinter, PythonLinter, ComposerLi
 
 
 OUTPUT_RE = re.compile(
-    r"<stdin>:(?P<line>\d+):((?P<col>\d+):)?\s*"
-    r".*?((?P<error>error)|(?P<warning>warning|note)):\s*"
-    r"(?P<message>.+)",
-    re.MULTILINE,
+    r"((?P<error>error)|(?P<warning>warning)): (?P<message>.+)\n"
+    r" +--> (?P<file>(\w+/)*\w+.rs):(?P<line>\d+):(?P<col>\d+)\n"
+    r"(.+\|.*\n)+"
+    r"( += note: .+\n)*"
+    r"( += help: for further information visit (?P<help_link>\S+)\n)?"
+    r"(help: try this:\n(.+\|.*\n)+)?"
+    r"\n\n"
 )
 
 
 class Rust(Linter):
-    cmd = 'cargo clippy ${args} -'
-    regex = r''
-    multiline = False
+    cmd = 'cargo clippy ${args}'
+    regex = OUTPUT_RE
+    multiline = True
     defaults = {
         'selector': 'source.rust',
         'args': [],
